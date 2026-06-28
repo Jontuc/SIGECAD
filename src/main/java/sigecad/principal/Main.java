@@ -10,8 +10,6 @@ import sigecad.dao.EjecucionETLDAO;
 import sigecad.dao.ErrorValidacionDAO;
 import sigecad.dao.LogEjecucionDAO;
 import sigecad.dao.ProcesoETLDAO;
-import sigecad.modelo.EstadoProceso;
-import sigecad.modelo.ProcesoETL;
 import sigecad.servicio.EjecucionETLService;
 import sigecad.servicio.ProcesoETLService;
 import sigecad.servicio.ValidadorDatosService;
@@ -26,13 +24,9 @@ public final class Main {
     }
 
     public static void main(String[] args) {
-        boolean mysql = args.length > 0 && "--mysql".equalsIgnoreCase(args[0]);
-        try (Connection conexion = mysql ? ConexionBD.abrir() : null;
+        try (Connection conexion = ConexionBD.abrir();
              Scanner scanner = new Scanner(System.in)) {
             Contexto contexto = crearContexto(conexion);
-            if (!mysql) {
-                cargarDemo(contexto.procesos());
-            }
             MenuConsolaView vista = new MenuConsolaView(scanner);
             SIGECADController controlador = new SIGECADController(
                     vista,
@@ -45,28 +39,18 @@ public final class Main {
     }
 
     private static Contexto crearContexto(Connection conexion) {
-        ProcesoETLDAO procesoDAO = conexion == null
-                ? new ProcesoETLDAO() : new ProcesoETLDAO(conexion);
+        ProcesoETLDAO procesoDAO = new ProcesoETLDAO(conexion);
         ProcesoETLService procesos = new ProcesoETLService(procesoDAO);
         EjecucionETLService ejecuciones = new EjecucionETLService(
                 procesos,
-                conexion == null ? new ArchivoFuenteDAO() : new ArchivoFuenteDAO(conexion),
-                conexion == null ? new EjecucionETLDAO() : new EjecucionETLDAO(conexion),
-                conexion == null ? new ErrorValidacionDAO() : new ErrorValidacionDAO(conexion),
-                conexion == null ? new LogEjecucionDAO() : new LogEjecucionDAO(conexion),
-                conexion == null ? new AlertaDAO() : new AlertaDAO(conexion),
+                new ArchivoFuenteDAO(conexion),
+                new EjecucionETLDAO(conexion),
+                new ErrorValidacionDAO(conexion),
+                new LogEjecucionDAO(conexion),
+                new AlertaDAO(conexion),
                 new ValidadorDatosService(),
                 conexion);
         return new Contexto(procesos, ejecuciones);
-    }
-
-    private static void cargarDemo(ProcesoETLService procesos) {
-        procesos.registrar(new ProcesoETL(
-                0, "Carga de ventas CSV", "Carga informacion de ventas",
-                "ventas.csv", "tabla_ventas", EstadoProceso.ACTIVO));
-        procesos.registrar(new ProcesoETL(
-                0, "Carga de clientes CSV", "Carga informacion de clientes",
-                "clientes.csv", "tabla_clientes", EstadoProceso.ACTIVO));
     }
 
     private record Contexto(

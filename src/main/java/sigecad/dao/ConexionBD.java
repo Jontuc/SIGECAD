@@ -15,6 +15,13 @@ public final class ConexionBD {
         return DriverManager.getConnection(url, usuario, password);
     }
 
+    public static Connection abrirServidor() throws SQLException {
+        String url = entorno("SIGECAD_DB_SERVER_URL", "jdbc:mysql://localhost:3306/");
+        String usuario = entorno("SIGECAD_DB_USER", "root");
+        String password = entorno("SIGECAD_DB_PASSWORD", "");
+        return DriverManager.getConnection(url, usuario, password);
+    }
+
     private static String entorno(String nombre, String predeterminado) {
         String valor = System.getenv(nombre);
         return valor == null || valor.isBlank() ? predeterminado : valor;

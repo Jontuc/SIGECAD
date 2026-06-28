@@ -60,8 +60,9 @@ vista y controladores, cargar datos demo e iniciar la aplicacion.
 `modelo` contiene `Usuario`, `Rol`, `ProcesoETL`, `ArchivoFuente`,
 `EjecucionETL`, `ErrorValidacion`, `LogEjecucion` y `Alerta`.
 
-`dao` encapsula las sentencias SQL con `PreparedStatement`. Los mismos DAO
-poseen un modo memoria para presentar el programa sin instalar MySQL.
+`dao` encapsula las sentencias SQL con `PreparedStatement`. La aplicacion final
+trabaja integrada con MySQL; el almacenamiento en memoria queda reservado para
+la prueba automatica de logica sin afectar la base real.
 
 `servicio` contiene autenticacion, administracion de procesos, validacion de
 datos y coordinacion de ejecuciones.
@@ -128,5 +129,5 @@ obtiene de variables de entorno para no guardar la clave de MySQL en Java.
 
 `probar.bat` verifica alta, consulta por ID, busqueda, modificacion completa,
 cambio de estado, baja logica, CSV valido, CSV invalido, historial, errores,
-alertas y polimorfismo. `ejecutar-demo.bat` inicia el menu sin MySQL y
+alertas y polimorfismo. `inicializar-mysql.bat` crea las tablas con JDBC y
 `ejecutar-mysql.bat` utiliza el esquema real.

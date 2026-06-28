@@ -1,4 +1,4 @@
 @echo off
-call compilar.bat
-if errorlevel 1 exit /b %ERRORLEVEL%
-java -cp out sigecad.principal.Main
+echo SIGECAD ahora se ejecuta integrado con MySQL.
+echo Use ejecutar-mysql.bat despues de configurar la base de datos.
+exit /b 1

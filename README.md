@@ -18,7 +18,7 @@ Vista -> Controlador -> Servicio -> DAO -> MySQL
 ```text
 src/main/java/sigecad/
 |- modelo/        Entidades, enums y abstracciones del dominio
-|- dao/           Persistencia JDBC/MySQL y modo memoria
+|- dao/           Persistencia JDBC/MySQL
 |- servicio/      Reglas de negocio y validacion de CSV
 |- vista/         MenuConsolaView
 |- controlador/   Controladores MVC
@@ -34,23 +34,30 @@ Controlador coordina; el Servicio valida y aplica reglas; el DAO persiste.
 - MySQL 8 para modo MySQL.
 - MySQL Connector/J como `lib/mysql-connector-j.jar` para modo MySQL.
 
-## Ejecutar sin MySQL
+## Ejecucion integrada con MySQL
 
-```powershell
-.\ejecutar-demo.bat
-```
+El programa de consola usa MySQL obligatoriamente. `ejecutar-demo.bat` queda
+solo como aviso para no ejecutar una version en memoria por error.
 
-Este modo usa almacenamiento en memoria y carga procesos de ejemplo.
+## Crear las tablas MySQL
 
-## Crear la base MySQL
-
-Ejecutar el script:
+Si tenes el cliente MySQL instalado, podes ejecutar el script:
 
 ```sql
 source sql/sigecad.sql;
 ```
 
-O importarlo desde MySQL Workbench. Luego configurar:
+Tambien podes importarlo desde MySQL Workbench. El proyecto incluye ademas un
+inicializador Java para crear la estructura sin depender del cliente `mysql`:
+
+```powershell
+$env:SIGECAD_DB_SERVER_URL="jdbc:mysql://localhost:3306/"
+$env:SIGECAD_DB_USER="root"
+$env:SIGECAD_DB_PASSWORD="tu_clave"
+.\inicializar-mysql.bat
+```
+
+Luego ejecutar la aplicacion:
 
 ```powershell
 $env:SIGECAD_DB_URL="jdbc:mysql://localhost:3306/sigecad"
@@ -65,9 +72,10 @@ $env:SIGECAD_DB_PASSWORD="tu_clave"
 .\probar.bat
 ```
 
-La prueba verifica alta, busqueda, consulta por ID, modificacion completa,
-cambio de estado, baja logica, CSV valido, CSV invalido, errores, alertas,
-historial y polimorfismo.
+La prueba usa DAOs en memoria para validar la logica sin tocar la base real.
+Verifica alta, busqueda, consulta por ID, modificacion completa, cambio de
+estado, baja logica, CSV valido, CSV invalido, errores, alertas, historial y
+polimorfismo.
 
 ## Funcionalidades demostrables
 
