@@ -26,6 +26,29 @@ public final class PruebaAplicacion {
         procesos.registrar(new ProcesoETL(
                 0, "Ventas", "Carga CSV", "ventas.csv", "tabla_ventas",
                 EstadoProceso.ACTIVO));
+        procesos.registrar(new ProcesoETL(
+                0, "Clientes", "Carga clientes", "clientes.csv", "tabla_clientes",
+                EstadoProceso.ACTIVO));
+
+        verificar(procesos.listarOrdenados().size() == 2, "alta de proceso");
+        verificar(procesos.buscarPorId(1).getNombre().equals("Ventas"),
+                "consulta por ID");
+        verificar(procesos.buscarPorTexto("ventas").size() == 1, "busqueda");
+
+        procesos.modificar(new ProcesoETL(
+                1, "Ventas Diarias", "Carga ventas diaria", "ventas_diarias.csv",
+                "tabla_ventas_diarias", EstadoProceso.ACTIVO));
+        verificar(procesos.buscarPorId(1).getDestinoDatos()
+                .equals("tabla_ventas_diarias"), "modificacion completa");
+
+        procesos.cambiarEstado(2, EstadoProceso.INACTIVO);
+        verificar(procesos.buscarPorId(2).getEstado() == EstadoProceso.INACTIVO,
+                "cambio de estado");
+
+        procesos.bajaLogica(1);
+        verificar(procesos.buscarPorId(1).getEstado() == EstadoProceso.INACTIVO,
+                "baja logica");
+        procesos.cambiarEstado(1, EstadoProceso.ACTIVO);
 
         Path valido = Files.createTempFile("sigecad-valido", ".csv");
         Files.writeString(valido, "id;producto;cantidad\n1;Teclado;2\n2;Mouse;3\n");
@@ -40,7 +63,6 @@ public final class PruebaAplicacion {
         verificar(ejecuciones.listarErrores().size() == 1, "errores");
         verificar(ejecuciones.listarAlertas().size() == 1, "alertas");
         verificar(ejecuciones.resumirEventos().size() == 5, "polimorfismo");
-        verificar(procesos.buscarPorTexto("ventas").size() == 1, "busqueda");
         System.out.println("Todas las pruebas finalizaron correctamente.");
     }
 

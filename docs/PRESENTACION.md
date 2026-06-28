@@ -23,8 +23,8 @@ Prototipo operacional en Java nativo, JDBC y MySQL.
 ## Diapositiva 4 - PUD
 
 - Inicio: problema, actores y alcance.
-- Elaboracion: arquitectura por capas y modelo de datos.
-- Construccion: incrementos Java, DAO y validacion.
+- Elaboracion: MVC, capas internas DAO/Service y modelo de datos.
+- Construccion: vista, controladores, DAO, servicios y validacion.
 - Transicion: scripts, pruebas y documentacion.
 
 ## Diapositiva 5 - Estructura
@@ -34,6 +34,8 @@ sigecad/
 |- modelo/
 |- dao/
 |- servicio/
+|- vista/
+|- controlador/
 |- principal/
 ```
 
@@ -62,11 +64,12 @@ CSV -> ArchivoFuente -> EjecucionETL -> Validacion
 
 ## Diapositiva 9 - Demostracion
 
-1. Listar procesos.
-2. Validar `datos\ventas.csv`.
-3. Consultar ejecucion y logs.
-4. Validar `datos\ventas_error.csv`.
-5. Consultar errores y alerta.
+1. Alta, busqueda y consulta por ID.
+2. Modificacion completa y cambio de estado.
+3. Baja logica con confirmacion.
+4. Validar `datos\ventas.csv`.
+5. Validar `datos\ventas_error.csv`.
+6. Consultar logs, errores y alerta.
 
 ## Diapositiva 10 - Limite y siguiente incremento
 

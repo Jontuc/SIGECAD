@@ -74,6 +74,37 @@ public class ProcesoETLDAO {
         }
     }
 
+    public void actualizar(ProcesoETL proceso) {
+        if (conexion == null) {
+            if (!memoria.containsKey(proceso.getIdProceso())) {
+                throw new IllegalArgumentException(
+                        "No existe el proceso " + proceso.getIdProceso());
+            }
+            memoria.put(proceso.getIdProceso(), proceso);
+            return;
+        }
+        String sql = """
+                UPDATE procesos_etl
+                SET nombre = ?, descripcion = ?, fuente_datos = ?,
+                    destino_datos = ?, estado = ?
+                WHERE id_proceso = ?
+                """;
+        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+            ps.setString(1, proceso.getNombre());
+            ps.setString(2, proceso.getDescripcion());
+            ps.setString(3, proceso.getFuenteDatos());
+            ps.setString(4, proceso.getDestinoDatos());
+            ps.setString(5, proceso.getEstado().name());
+            ps.setInt(6, proceso.getIdProceso());
+            if (ps.executeUpdate() == 0) {
+                throw new IllegalArgumentException(
+                        "No existe el proceso " + proceso.getIdProceso());
+            }
+        } catch (SQLException e) {
+            throw new DAOException("No se pudo actualizar el proceso", e);
+        }
+    }
+
     public Optional<ProcesoETL> buscarPorId(int id) {
         if (conexion == null) {
             return Optional.ofNullable(memoria.get(id));
@@ -108,6 +139,10 @@ public class ProcesoETLDAO {
         } catch (SQLException e) {
             throw new DAOException("No se pudo actualizar el proceso", e);
         }
+    }
+
+    public void bajaLogica(int id) {
+        actualizarEstado(id, EstadoProceso.INACTIVO);
     }
 
     private ProcesoETL mapear(ResultSet rs) throws SQLException {

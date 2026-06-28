@@ -16,6 +16,7 @@ public class ProcesoETLService {
     }
 
     public ProcesoETL registrar(ProcesoETL proceso) {
+        validar(proceso);
         return procesoDAO.guardar(proceso);
     }
 
@@ -44,5 +45,26 @@ public class ProcesoETLService {
 
     public void cambiarEstado(int id, EstadoProceso estado) {
         procesoDAO.actualizarEstado(id, estado);
+    }
+
+    public void modificar(ProcesoETL proceso) {
+        validar(proceso);
+        if (proceso.getIdProceso() <= 0) {
+            throw new IllegalArgumentException("El identificador del proceso es obligatorio");
+        }
+        procesoDAO.actualizar(proceso);
+    }
+
+    public void bajaLogica(int id) {
+        procesoDAO.bajaLogica(id);
+    }
+
+    private void validar(ProcesoETL proceso) {
+        if (proceso == null) {
+            throw new IllegalArgumentException("El proceso es obligatorio");
+        }
+        if (proceso.getEstado() == null) {
+            throw new IllegalArgumentException("El estado del proceso es obligatorio");
+        }
     }
 }

@@ -12,7 +12,9 @@ validacion y trazabilidad de un archivo CSV.
 
 ## 2. Alcance
 
-- Registrar, listar, buscar y cambiar el estado de procesos ETL.
+- Registrar, listar, buscar, consultar por ID, modificar y cambiar el estado de
+  procesos ETL.
+- Aplicar baja logica de procesos para respetar integridad referencial.
 - Recibir la ruta de un CSV y validar su estructura.
 - Registrar el archivo y su ejecucion.
 - Guardar errores de validacion, logs y alertas.
@@ -29,11 +31,11 @@ de cada destino.
 **Inicio.** Se definieron el problema, los actores y los casos de uso:
 administrar procesos, validar archivos y consultar resultados.
 
-**Elaboracion.** Se adopto una arquitectura por capas y se mapeo cada entidad
-Java con las tablas de `Modelo_SIGECAD.sql`.
+**Elaboracion.** Se adopto MVC como organizacion principal y se mantuvieron DAO
+y servicios como capas internas para persistencia y reglas de negocio.
 
-**Construccion.** Se desarrollaron modelos, DAO, servicios, menu, validacion CSV
-y pruebas incrementales.
+**Construccion.** Se desarrollaron modelos, DAO, servicios, vista, controladores,
+validacion CSV, transaccion JDBC en la ejecucion y pruebas incrementales.
 
 **Transicion.** Se agregaron scripts de compilacion, modo demostracion, modo
 MySQL, datos de ejemplo y documentacion.
@@ -41,14 +43,19 @@ MySQL, datos de ejemplo y documentacion.
 ## 4. Arquitectura
 
 ```text
-principal/Main
-      |
+vista/MenuConsolaView
+        |
+controlador/
+        |
 servicio/
-      |
+        |
 dao/ -------- JDBC -------- MySQL
-      |
+        |
 modelo/
 ```
+
+`principal.Main` queda limitado a abrir la conexion, crear DAOs, servicios,
+vista y controladores, cargar datos demo e iniciar la aplicacion.
 
 `modelo` contiene `Usuario`, `Rol`, `ProcesoETL`, `ArchivoFuente`,
 `EjecucionETL`, `ErrorValidacion`, `LogEjecucion` y `Alerta`.
@@ -58,6 +65,10 @@ poseen un modo memoria para presentar el programa sin instalar MySQL.
 
 `servicio` contiene autenticacion, administracion de procesos, validacion de
 datos y coordinacion de ejecuciones.
+
+`vista` muestra el menu, lee datos, confirma operaciones y presenta resultados.
+`controlador` recibe esas acciones, invoca servicios y maneja errores de negocio
+sin SQL ni JDBC directo.
 
 ## 5. Programacion orientada a objetos
 
@@ -84,6 +95,8 @@ resultado.
 6. Los errores se guardan mediante `ErrorValidacionDAO`.
 7. Se actualiza la ejecucion como `EXITOSO` o `FALLIDO`.
 8. Se guardan logs y, si corresponde, una alerta pendiente.
+9. En modo MySQL, el flujo se ejecuta dentro de una transaccion JDBC: commit si
+   termina correctamente y rollback ante errores inesperados.
 
 ## 7. Base de datos
 
@@ -113,6 +126,7 @@ obtiene de variables de entorno para no guardar la clave de MySQL en Java.
 
 ## 9. Evidencia
 
-`probar.bat` verifica un CSV valido, otro invalido, historial, errores, alertas,
-polimorfismo y busqueda. `ejecutar-demo.bat` inicia el menu sin MySQL y
+`probar.bat` verifica alta, consulta por ID, busqueda, modificacion completa,
+cambio de estado, baja logica, CSV valido, CSV invalido, historial, errores,
+alertas y polimorfismo. `ejecutar-demo.bat` inicia el menu sin MySQL y
 `ejecutar-mysql.bat` utiliza el esquema real.
